@@ -30,12 +30,14 @@ public class JavaHttpAndHttps {
                 "    \"pageBean\": {}\n" +
                 "}";
 
-        System.out.println("http->httpRequest:"+httpRequest("http://localhost/test", "POST", postContent));
+       // System.out.println("http->httpRequest:"+httpRequest("http://localhost/test", "POST", postContent));
         //error
-        // System.out.println("https->httpRequest:"+httpRequest("https://localhost/test", "POST", postContent));
-        System.out.println("https->httpRequest:"+httpsRequest(new MyX509TrustAllManager(),"https://localhost/test", "POST", postContent));
-        URL resource = JavaHttpAndHttps.class.getResource("my.keystore");
-        System.out.println("https->httpRequest:"+httpsRequest(new MyX509TrustManager(resource.getFile().toString(),"123456"),"https://localhost/test", "POST", postContent));
+      //  System.out.println("https->httpRequest:"+httpRequest("https://localhost/test", "POST", postContent));
+      // System.out.println("https->httpRequest:"+httpsRequest(new MyX509TrustAllManager(),"https://localhost/test", "POST", postContent));
+        //URL resource = JavaHttpAndHttps.class.getResource("my.keystore");
+        // String fileName="/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore";
+        //System.out.println("https->httpRequest:"+httpsRequest(new MyX509TrustManager(fileName,"123456"),"https://192.168.1.117/test", "POST", postContent));
+        System.out.println("https->httpRequest1:"+httpsRequest1("https://192.168.1.117/test", "POST", postContent));
 
     }
 
@@ -114,6 +116,7 @@ public class JavaHttpAndHttps {
             TrustManager[] tm={trustManager};
             //初始化
             sslContext.init(null, tm, new java.security.SecureRandom());;
+         //   sslContext.init(null, tm, null);;
             //获取SSLSocketFactory对象
             SSLSocketFactory ssf=sslContext.getSocketFactory();
             URL url=new URL(requestUrl);
@@ -123,6 +126,13 @@ public class JavaHttpAndHttps {
             conn.setUseCaches(false);
             conn.setRequestMethod(requestMethod);
             conn.setRequestProperty("Content-Type","application/json;charset=UTF-8");
+            // 修改ip 不宜用，
+            conn.setHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String s, SSLSession sslSession) {
+                    return true;
+                }
+            });
             //设置当前实例使用的SSLSoctetFactory
             conn.setSSLSocketFactory(ssf);
             conn.connect();
@@ -160,12 +170,13 @@ public class JavaHttpAndHttps {
         X509TrustManager sunJSSEX509TrustManager;
         MyX509TrustManager(String trustStoreFile,String passphrase)  {
             try {
+
+
                 // create a "default" JSSE X509TrustManager.
                 KeyStore ks = KeyStore.getInstance("JKS");
-                ks.load(new FileInputStream(trustStoreFile),
-                        passphrase.toCharArray());
-                TrustManagerFactory tmf =
-                        TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+                ks.load(new FileInputStream(trustStoreFile), passphrase.toCharArray());
+               TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+             //   TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
                 tmf.init(ks);
                 TrustManager tms [] = tmf.getTrustManagers();
                 /*
@@ -201,6 +212,7 @@ public class JavaHttpAndHttps {
                 sunJSSEX509TrustManager.checkClientTrusted(chain, authType);
             } catch (CertificateException excep) {
                 // do any special handling here, or rethrow exception.
+                throw  excep;
             }
         }
         /*
@@ -215,6 +227,7 @@ public class JavaHttpAndHttps {
                  * Possibly pop up a dialog box asking whether to trust the
                  * cert chain.
                  */
+                throw  excep;
             }
         }
         /*
@@ -224,5 +237,60 @@ public class JavaHttpAndHttps {
             return sunJSSEX509TrustManager.getAcceptedIssuers();
         }
     }
+    // 使用默认为所有的链接都为安全 忽略证书信任 方式一
+    public static String httpsRequest1( String requestUrl,String requestMethod,String outputStr){
+        StringBuffer buffer=null;
+        try{
+            //创建SSLContext
+            SSLContext sslContext= SSLContext.getInstance("SSL");
+            KeyStore ks = KeyStore.getInstance("JKS");
+            String trustStoreFile="/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore";
+            ks.load(new FileInputStream(trustStoreFile), "123456".toCharArray());
+          //  TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+               TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
+            tmf.init(ks);
+            TrustManager tms[] = tmf.getTrustManagers();
+            //初始化
+            sslContext.init(null, tms, null);;
+            //   sslContext.init(null, tm, null);;
+            //获取SSLSocketFactory对象
+            SSLSocketFactory ssf=sslContext.getSocketFactory();
+            URL url=new URL(requestUrl);
+            HttpsURLConnection conn=(HttpsURLConnection)url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod(requestMethod);
+            conn.setRequestProperty("Content-Type","application/json;charset=UTF-8");
+            // 修改ip 不宜用，
+            conn.setHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String s, SSLSession sslSession) {
+                    return true;
+                }
+            });
+            //设置当前实例使用的SSLSoctetFactory
+            conn.setSSLSocketFactory(ssf);
+            conn.connect();
+            //往服务器端写内容
+            if(null!=outputStr){
+                OutputStream os=conn.getOutputStream();
+                os.write(outputStr.getBytes("utf-8"));
+                os.close();
+            }
 
+            //读取服务器端返回的内容
+            InputStream is=conn.getInputStream();
+            InputStreamReader isr=new InputStreamReader(is,"utf-8");
+            BufferedReader br=new BufferedReader(isr);
+            buffer=new StringBuffer();
+            String line=null;
+            while((line=br.readLine())!=null){
+                buffer.append(line);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return buffer.toString();
+    }
 }
