@@ -4,22 +4,24 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
-import com.sun.jersey.client.urlconnection.HTTPSProperties;
-import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.*;
 import javax.ws.rs.core.MediaType;
 import java.io.FileInputStream;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 public class JerseyHttpAndHttps {
     public static void main(String[] args) throws Exception {
-       // System.setProperty("javax.net.ssl.trustStore", "/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore");
-       // System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+        //System.setProperty("javax.net.ssl.trustStore", "/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore");
+        //System.setProperty("javax.net.ssl.trustStorePassword", "123456");
         DefaultApacheHttpClient4Config config = setConfig();
         Client client = ApacheHttpClient4.create( config );
         WebResource webResource = client.resource("https://localhost/test");
@@ -42,6 +44,7 @@ public class JerseyHttpAndHttps {
         ClientResponse post = builder.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, postContent);
         System.out.println(post.getStatus());
 
+
     }
 
 
@@ -58,7 +61,46 @@ public class JerseyHttpAndHttps {
                 return true;
             }
         };
-        config.getProperties().put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new HTTPSProperties( hv, ctx ) );
+       // this code not  Take effect
+      //  config.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new HTTPSProperties( hv, SSLUtil.getInsecureSSLContext() ) );
+
+        SSLSocketFactory sf = new SSLSocketFactory(ctx);
+        Scheme scheme = new Scheme("https", sf, 443);
+        ThreadSafeClientConnManager threadSafeClientConnManager = new ThreadSafeClientConnManager();
+        threadSafeClientConnManager.getSchemeRegistry().register(scheme);
+        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER,threadSafeClientConnManager);
+
         return config;
     }
+
+    private static class SSLUtil {
+        protected static SSLContext getInsecureSSLContext()
+                throws KeyManagementException, NoSuchAlgorithmException {
+            final TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+
+                        public void checkClientTrusted(
+                                final java.security.cert.X509Certificate[] arg0, final String arg1)
+                                throws CertificateException {
+                            // do nothing and blindly accept the certificate
+                        }
+
+                        public void checkServerTrusted(
+                                final java.security.cert.X509Certificate[] arg0, final String arg1)
+                                throws CertificateException {
+                            // do nothing and blindly accept the server
+                        }
+
+                    }
+            };
+            final SSLContext sslcontext = SSLContext.getInstance("SSL");
+            sslcontext.init(null, trustAllCerts,
+                    new java.security.SecureRandom());
+            return sslcontext;
+        }
+    }
+
 }
