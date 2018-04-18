@@ -11,6 +11,9 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+/**
+ * 单向认证
+ */
 public class JavaHttpAndHttps {
 
     public static void main(String[] args) {
