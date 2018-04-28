@@ -41,6 +41,7 @@ public class JavaHttpAndHttps {
         // String fileName="/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore";
         //System.out.println("https->httpRequest:"+httpsRequest(new MyX509TrustManager(fileName,"123456"),"https://192.168.1.117/test", "POST", postContent));
         System.out.println("https->httpRequest1:"+httpsRequest1("https://192.168.1.117/test", "POST", postContent));
+    //    System.out.println("https->httpsTwoRequest:"+httpsTwoRequest("https://p0549-iflmap.hcisbp.us2.hana.ondemand.com/http/httpTest", "GET", "{}"));
 
     }
 
@@ -253,8 +254,16 @@ public class JavaHttpAndHttps {
                TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
             tmf.init(ks);
             TrustManager tms[] = tmf.getTrustManagers();
+
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            KeyStore pks = KeyStore.getInstance("PKCS12");
+            pks.load(new FileInputStream("/Users/chenq/apps/docker_nginx_conf/certs/client.p12"), "123456".toCharArray());
+            kmf.init(pks,"123456".toCharArray());
+
+
             //初始化
-            sslContext.init(null, tms, null);;
+            sslContext.init(kmf.getKeyManagers(), tms, null);;
             //   sslContext.init(null, tm, null);;
             //获取SSLSocketFactory对象
             SSLSocketFactory ssf=sslContext.getSocketFactory();
@@ -296,4 +305,93 @@ public class JavaHttpAndHttps {
         }
         return buffer.toString();
     }
+
+
+    // 使用默认为所有的链接都为安全 忽略证书信任 方式一
+    public static String httpsTwoRequest( String requestUrl,String requestMethod,String outputStr){
+        StringBuffer buffer=null;
+        try{
+            final TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+
+                        public void checkClientTrusted(
+                                final java.security.cert.X509Certificate[] arg0, final String arg1)
+                                throws CertificateException {
+                            // do nothing and blindly accept the certificate
+                        }
+
+                        public void checkServerTrusted(
+                                final java.security.cert.X509Certificate[] arg0, final String arg1)
+                                throws CertificateException {
+                            // do nothing and blindly accept the server
+                        }
+
+                    }
+            };
+
+            //创建SSLContext
+            SSLContext sslContext= SSLContext.getInstance("SSL");
+//            KeyStore ks = KeyStore.getInstance("JKS");
+//            String trustStoreFile="/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore";
+//            ks.load(new FileInputStream(trustStoreFile), "123456".toCharArray());
+//            //  TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509", "SunJSSE");
+//            TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
+//            tmf.init(ks);
+//           TrustManager tms[] = tmf.getTrustManagers();
+
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            KeyStore pks = KeyStore.getInstance("JKS");
+            pks.load(new FileInputStream("/Users/chenq/code/java/java-common/src/main/java/com/github/yulechen/http/authentication/twoway/kserver.keystore"), "123456".toCharArray());
+            kmf.init(pks,"123456".toCharArray());
+
+            //初始化
+            sslContext.init(kmf.getKeyManagers(), trustAllCerts, null);;
+
+            SSLSocketFactory ssf=sslContext.getSocketFactory();
+            URL url=new URL(requestUrl);
+            HttpsURLConnection conn=(HttpsURLConnection)url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod(requestMethod);
+            conn.setRequestProperty("Authorization","Basic UzAwMTU3NDI0NDM6TWF2ZTEyMzQq");
+            conn.setRequestProperty("Content-Type","application/json;charset=UTF-8");
+            // 修改ip 不宜用，
+            conn.setHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String s, SSLSession sslSession) {
+                    return true;
+                }
+            });
+            //设置当前实例使用的SSLSoctetFactory
+            conn.setSSLSocketFactory(ssf);
+            conn.connect();
+            //往服务器端写内容
+            if(null!=outputStr){
+                OutputStream os=conn.getOutputStream();
+                os.write(outputStr.getBytes("utf-8"));
+                os.close();
+            }
+
+            //读取服务器端返回的内容
+            InputStream is=conn.getInputStream();
+            InputStreamReader isr=new InputStreamReader(is,"utf-8");
+            BufferedReader br=new BufferedReader(isr);
+            buffer=new StringBuffer();
+            String line=null;
+            while((line=br.readLine())!=null){
+                buffer.append(line);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return buffer.toString();
+    }
+
+
+
 }

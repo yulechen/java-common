@@ -24,7 +24,7 @@ public class JerseyHttpAndHttps {
         //System.setProperty("javax.net.ssl.trustStorePassword", "123456");
         DefaultApacheHttpClient4Config config = setConfig();
         Client client = ApacheHttpClient4.create( config );
-        WebResource webResource = client.resource("https://localhost/test");
+        WebResource webResource = client.resource("https://p0549-iflmap.hcisbp.us2.hana.ondemand.com/http/httpTest");
         String postContent="{\n" +
                 "    \"header\": {\n" +
                 "        \"serviceCode\": \"TEST\",\n" +
@@ -52,10 +52,18 @@ public class JerseyHttpAndHttps {
         DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
         KeyStore trustStore = KeyStore.getInstance( "JKS" );
         trustStore.load( new FileInputStream("/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore" ), "123456".toCharArray() );
+
+        // Trust key
         TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
         tmf.init( trustStore );
+
+        // private key
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(new FileInputStream("/Users/chenq/code/java/java-common/src/main/java/com/github/yulechen/http/authentication/twoway/kserver.keystore"), "123456".toCharArray());
+        kmf.init(ks,"123456".toCharArray());
         SSLContext ctx = SSLContext.getInstance( "SSL" );
-        ctx.init( null, tmf.getTrustManagers(), null );
+        ctx.init( kmf.getKeyManagers(), tmf.getTrustManagers(), null );
         HostnameVerifier hv = new HostnameVerifier() {
             public boolean verify( String hostname, SSLSession session ) {
                 return true;
