@@ -37,11 +37,26 @@
       <version>1.19.1</version>
     </dependency>
 
-   <!--sftp -->
+    <!--sftp -->
     <dependency>
       <groupId>com.jcraft</groupId>
       <artifactId>jsch</artifactId>
       <version>0.1.54</version>
+    </dependency>
+
+     <!-- java 安全 http://www.bouncycastle.org/latest_releases.html -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk16</artifactId>
+      <version>1.45</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
+      <version>1.0.1</version>
+
     </dependency>
 
   </dependencies>

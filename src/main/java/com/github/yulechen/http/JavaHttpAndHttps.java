@@ -40,8 +40,8 @@ public class JavaHttpAndHttps {
         //URL resource = JavaHttpAndHttps.class.getResource("my.keystore");
         // String fileName="/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore";
         //System.out.println("https->httpRequest:"+httpsRequest(new MyX509TrustManager(fileName,"123456"),"https://192.168.1.117/test", "POST", postContent));
-        System.out.println("https->httpRequest1:"+httpsRequest1("https://192.168.1.117/test", "POST", postContent));
-    //    System.out.println("https->httpsTwoRequest:"+httpsTwoRequest("https://p0549-iflmap.hcisbp.us2.hana.ondemand.com/http/httpTest", "GET", "{}"));
+        //System.out.println("https->httpRequest1:"+httpsRequest1("https://192.168.1.117/test", "POST", postContent));
+       System.out.println("https->httpsTwoRequest:"+httpsTwoRequest("https://p0549-iflmap.hcisbp.us2.hana.ondemand.com/http/httpTest", "GET", "{}"));
 
     }
 
