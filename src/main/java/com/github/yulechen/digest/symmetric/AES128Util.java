@@ -12,8 +12,11 @@ import java.util.Base64;
 /**
  * Created by fangzhipeng on 2017/3/21.
  */
-public class AESUtil {
+public class AES128Util {
 
+    /**
+     * key 只能为16byte，16*8=128bit
+     */
     static  byte[]  key = "w@#$4@#$s^&3*&^4".getBytes();
     final static String algorithm="AES";
 

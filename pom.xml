@@ -47,8 +47,15 @@
      <!-- java 安全 http://www.bouncycastle.org/latest_releases.html -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk16</artifactId>
-      <version>1.45</version>
+      <artifactId>bcprov-jdk15</artifactId>
+      <version>1.57</version>
+    </dependency>
+
+    <!--GPG -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk15on</artifactId>
+      <version>1.57</version>
     </dependency>
 
 
