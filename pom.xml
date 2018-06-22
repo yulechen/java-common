@@ -45,25 +45,34 @@
     </dependency>
 
      <!-- java 安全 http://www.bouncycastle.org/latest_releases.html -->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15</artifactId>
-      <version>1.57</version>
-    </dependency>
+
 
     <!--GPG -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpg-jdk15on</artifactId>
-      <version>1.57</version>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.56</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk15on</artifactId>
+      <version>1.56</version>
+    </dependency>
+
 
 
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
       <version>1.0.1</version>
+    </dependency>
 
+     <!--java反应式编程-->
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-core</artifactId>
+      <version>3.1.7.RELEASE</version>
     </dependency>
 
   </dependencies>
