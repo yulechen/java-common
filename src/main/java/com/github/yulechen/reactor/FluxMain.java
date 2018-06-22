@@ -10,7 +10,8 @@ import java.util.Random;
 
 public class FluxMain {
     public static void main(String[] args) {
-
+        createSimpleFlux();
+        createFulxByGenerate();
     }
 
 
