@@ -12,7 +12,7 @@ public class Data {
 
     public void forEachElement(ForEachMock<String> element){
         for (String datum : data) {
-            element.forEachOut(datum);
+            element.foreach(datum);
         }
     }
 }
