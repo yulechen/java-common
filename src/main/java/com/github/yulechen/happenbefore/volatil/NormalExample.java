@@ -64,7 +64,9 @@ public class NormalExample {
 
 
     public static void main(String[] args) {
-
+        /**
+         * write must before read
+         */
         for(int j =0; j<10 ;j++) {
             System.out.println("NormalExample  Test Result:");
             System.out.println("Write                       Read");

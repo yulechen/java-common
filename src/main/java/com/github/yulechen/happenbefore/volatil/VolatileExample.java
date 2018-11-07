@@ -63,6 +63,9 @@ public class VolatileExample {
 
 
     public static void main(String[] args) {
+        /**
+         * write maybe before read
+         */
         for(int j =0; j<10 ;j++) {
             System.out.println("VolatileExample  Test Result:");
             System.out.println("Write                       Read");
