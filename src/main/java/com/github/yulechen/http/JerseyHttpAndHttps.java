@@ -6,15 +6,14 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
 import javax.net.ssl.*;
 import javax.ws.rs.core.MediaType;
-import java.io.FileInputStream;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
@@ -24,25 +23,12 @@ public class JerseyHttpAndHttps {
         //System.setProperty("javax.net.ssl.trustStorePassword", "123456");
         DefaultApacheHttpClient4Config config = setConfig();
         Client client = ApacheHttpClient4.create( config );
-        WebResource webResource = client.resource("https://p0549-iflmap.hcisbp.us2.hana.ondemand.com/http/httpTest");
-        String postContent="{\n" +
-                "    \"header\": {\n" +
-                "        \"serviceCode\": \"TEST\",\n" +
-                "        \"serviceName\": \"design\",\n" +
-                "        \"method\": \"test\",\n" +
-                "        \"IP\": \"192.168.1.117\"\n" +
-                "    },\n" +
-                "    \"body\": {\n" +
-                "        \"url\": \"https://apisalesdemo8.successfactors.com:443/sfapi/v1/soap\",\n" +
-                "        \"userName\": \"sfadmin\",\n" +
-                "        \"password\": \"runbest\",\n" +
-                "        \"companyId\": \"SFPART007340\"\n" +
-                "    },\n" +
-                "    \"pageBean\": {}\n" +
-                "}";
+        WebResource webResource = client.resource("https://192.168.1.117/test");
+        String postContent="{\"header\": {\"serviceCode\": \"TEST\",\"serviceName\": \"design\",\"method\":\"testConntect\"},\"body\": {\"timeout\": 1}}";
         WebResource.Builder builder = webResource.getRequestBuilder();
         ClientResponse post = builder.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, postContent);
         System.out.println(post.getStatus());
+        System.out.println(post.getEntity(String.class));
 
 
     }
@@ -50,29 +36,30 @@ public class JerseyHttpAndHttps {
 
     public static DefaultApacheHttpClient4Config setConfig() throws Exception {
         DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
-        KeyStore trustStore = KeyStore.getInstance( "JKS" );
-        trustStore.load( new FileInputStream("/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore" ), "123456".toCharArray() );
-
-        // Trust key
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
-        tmf.init( trustStore );
-
-        // private key
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-        KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(new FileInputStream("/Users/chenq/code/java/java-common/src/main/java/com/github/yulechen/http/authentication/twoway/kserver.keystore"), "123456".toCharArray());
-        kmf.init(ks,"123456".toCharArray());
-        SSLContext ctx = SSLContext.getInstance( "SSL" );
-        ctx.init( kmf.getKeyManagers(), tmf.getTrustManagers(), null );
+//        KeyStore trustStore = KeyStore.getInstance( "JKS" );
+//        trustStore.load( new FileInputStream("/Users/chenq/apps/docker_nginx_conf/certs/truststore/my.keystore" ), "123456".toCharArray() );
+//
+//        // Trust key
+//        TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
+//        tmf.init( trustStore );
+//
+//        // private key
+//        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+//        KeyStore ks = KeyStore.getInstance("JKS");
+//        ks.load(new FileInputStream("/Users/chenq/code/java/java-common/src/main/java/com/github/yulechen/http/authentication/twoway/kserver.keystore"), "123456".toCharArray());
+//        kmf.init(ks,"123456".toCharArray());
+//        SSLContext ctx = SSLContext.getInstance( "SSL" );
+//        ctx.init( kmf.getKeyManagers(), tmf.getTrustManagers(), null );
         HostnameVerifier hv = new HostnameVerifier() {
             public boolean verify( String hostname, SSLSession session ) {
                 return true;
             }
         };
-       // this code not  Take effect
-      //  config.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new HTTPSProperties( hv, SSLUtil.getInsecureSSLContext() ) );
+        SSLContext insecureSSLContext = SSLUtil.getInsecureSSLContext();
+        // this code not  Take effect
+        config.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new HTTPSProperties( hv,  insecureSSLContext) );
 
-        SSLSocketFactory sf = new SSLSocketFactory(ctx);
+        SSLSocketFactory sf = new SSLSocketFactory(insecureSSLContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         Scheme scheme = new Scheme("https", sf, 443);
         ThreadSafeClientConnManager threadSafeClientConnManager = new ThreadSafeClientConnManager();
         threadSafeClientConnManager.getSchemeRegistry().register(scheme);
