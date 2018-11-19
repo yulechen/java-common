@@ -23,18 +23,24 @@ public class PplusOpenApiTest {
         String accessKey = "ehrb6a1be16e94511e8b5510242ac110069";
         String accessSerrect = "2bf0fa7f34e6c99687b12454c0ca82cb0fcdb3e28e768cd7925527b2c9824cd8";
         String url = "https://symphonyodoouat.peoplus.cn/v1/api/payslip_info";
+//        String bodyJson="{\"period_name\": \"201803\", \"batch_number\": \"2\"}";
+//        String body ="{\"json\": "+bodyJson+"}";
 
-        String body ="{\"period_name\": \"201803\", \"batch_number\": \"2\"}";
+        String keyBody="{\"period_name\": \"201803\", \"batch_number\": \"1\"}";
+        String requsetBody ="{\"json\": \"{\\\"period_name\\\": \\\"201803\\\", \\\"batch_number\\\": \\\"1\\\"}\"}";
 
+      //  System.out.println(body);
         Sign sign =new Sign();
         sign.setAccessKey(accessKey);
         sign.setSecretKey(accessSerrect);
-        sign.setBody(body);
+        sign.setBody(keyBody);
         sign.setSignatureNonce(UUID.randomUUID().toString().replace("-", ""));
         sign.setTimestamp(getTimestamp());
         sign.setSignatureVersion("v1");
         String signature = ApiSign.getSignature(sign);
         sign.setSignature(signature);
+
+        System.out.println();
 
         Client client = getClient();
         WebResource resource = client.resource(url);
@@ -44,7 +50,7 @@ public class PplusOpenApiTest {
         requestBuilder.header("AccessKey" , sign.getAccessKey());
         requestBuilder.header("Timestamp" , sign.getTimestamp());
         requestBuilder.header("Signature" , sign.getSignature());
-        ClientResponse postRestult = header.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, sign.getBody());
+        ClientResponse postRestult = header.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, requsetBody);
 
         String entity = postRestult.getEntity(String.class);
         System.out.println(entity);
