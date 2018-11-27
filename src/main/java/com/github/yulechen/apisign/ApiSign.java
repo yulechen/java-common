@@ -40,6 +40,7 @@ public class ApiSign {
 
     public static String getSignature(Sign sign) throws UnsupportedEncodingException {
         String signStr = String.format("body=%s&timestamp=%s&signatureNonce=%s", sign.getBody(), sign.getTimestamp(), sign.getSignatureNonce());
+      //  String signStr = String.format("body=%s&signatureNonce=%s", sign.getBody(), sign.getSignatureNonce());
         return HMACSHA256(signStr.getBytes("utf-8"), sign.getSecretKey().getBytes("utf-8"));
     }
 
@@ -51,6 +52,7 @@ public class ApiSign {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(signingKey);
             return byte2hex(mac.doFinal(data));
+          //  return Base64.getEncoder().encodeToString(mac.doFinal(data));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
@@ -70,6 +72,8 @@ public class ApiSign {
         }
         return hs.toString().toLowerCase();
     }
+
+
 
     public static String getTimestamp() {
         DateFormat df = new SimpleDateFormat("yyyy'T'MM月dd日 HH时mm分ss秒");
