@@ -3,8 +3,10 @@ package com.github.yulechen.leetcode;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class BinaryTreeMidTraverse {
+/**
+ * 中序遍历二叉树
+ */
+public class TraversalInOrder {
 
     /**
      *
@@ -40,15 +42,7 @@ public class BinaryTreeMidTraverse {
         return r;
     }
 
-    public static class TreeNode {
-        int val;
-        TreeNode left;
-        TreeNode right;
 
-        TreeNode(int x) {
-            val = x;
-        }
-    }
 
     public static void main(String[] args) {
 
@@ -57,7 +51,7 @@ public class BinaryTreeMidTraverse {
         TreeNode node3 = new TreeNode(3);
         node1.right = node2;
         node2.left = node3;
-        BinaryTreeMidTraverse bmtr = new BinaryTreeMidTraverse();
+        TraversalInOrder bmtr = new TraversalInOrder();
         System.out.println(bmtr.inorderTraversal(node1));
         System.out.println(bmtr.inorderTraversal2(node1));
 
