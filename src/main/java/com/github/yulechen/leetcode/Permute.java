@@ -6,6 +6,39 @@ import java.util.List;
 public class Permute {
 
 
+
+
+  public static List<List<Integer>> permute4( List<Integer> integers) {
+    List<List<Integer>> allTurn = new ArrayList<>();
+    int size =integers.size();
+    for(int a=0;a<size;a++){ // 0-3
+      List<Integer> swapNum1 = swapIndex(0, a, integers);
+      for(int i=1 ;i<size;i++){ // 1-3
+        List<Integer> swapNum = swapIndex(1, i, swapNum1);
+        for(int j=2;j<size;j++){  // 2-3
+          List<Integer> integers1 = swapIndex(2, j, swapNum);
+          allTurn.add(integers1);
+        }
+      }
+    }
+
+    return allTurn;
+  }
+
+  static List<List<Integer>> gloablTurn = new ArrayList<>();
+
+  public static void childPermute(int index,List<Integer> integers) {
+      for(int a=index;a<integers.size();a++){
+          List<Integer> swapNum1 = swapIndex(index, a, integers);
+          if(index==integers.size()-1){
+            gloablTurn.add(swapNum1);
+            return;
+          }
+          childPermute(index+1,swapNum1);
+      }
+  }
+
+
   /**
    * nums.length=3
    */
@@ -60,13 +93,20 @@ public class Permute {
 
 
   public static void main(String[] args) {
-    int[] src = {1,2,3,4};
-    List<List<Integer>> permute = permute(src);
-    int size = permute.size();
-    System.out.println(size); // 4*3*2*1
-    permute.forEach(System.out::println);
+    int[] src = {1,2,3};
+//    List<Integer> integers = converIntToInteger(src);
+//    List<List<Integer>> permute = permute4(integers);
+//    int size = permute.size();
+//    System.out.println(size);
+//    permute.forEach(System.out::println);
 
 
+    List<Integer> integer1 = converIntToInteger(src);
+    childPermute(0,integer1);
+
+    int size = gloablTurn.size();
+    System.out.println(size);
+    gloablTurn.forEach(System.out::println);
   }
 
 }
