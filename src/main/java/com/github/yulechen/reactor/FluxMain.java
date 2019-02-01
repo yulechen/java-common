@@ -1,16 +1,16 @@
 package com.github.yulechen.reactor;
 
-import reactor.core.publisher.Flux;
-
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Random;
+import reactor.core.publisher.Flux;
 //https://www.infoq.com/articles/reactor-by-example/
 
+/**
+ * 包含N 个
+ */
 public class FluxMain {
     public static void main(String[] args) {
-        createSimpleFlux();
+      //  createSimpleFlux();
         createFulxByGenerate();
     }
 
@@ -47,23 +47,23 @@ public class FluxMain {
         }).subscribe(System.out::println);
 
 
-        final Random random = new Random();
-        Flux.generate(ArrayList::new, (list, sink) -> {
-            int value = random.nextInt(100);
-            list.add(value);
-            sink.next(value);
-            if (list.size() == 10) {
-                sink.complete();
-            }
-            return list;
-        }).subscribe(System.out::println);
-
-        // use create
-        Flux.create(sink -> {
-            for (int i = 0; i < 10; i++) {
-                sink.next(i);
-            }
-            sink.complete();
-        }).subscribe(System.out::println);
+//        final Random random = new Random();
+//        Flux.generate(ArrayList::new, (list, sink) -> {
+//            int value = random.nextInt(100);
+//            list.add(value);
+//            sink.next(value);
+//            if (list.size() == 10) {
+//                sink.complete();
+//            }
+//            return list;
+//        }).subscribe(System.out::println);
+//
+//        // use create
+//        Flux.create(sink -> {
+//            for (int i = 0; i < 10; i++) {
+//                sink.next(i);
+//            }
+//            sink.complete();
+//        }).subscribe(System.out::println);
     }
 }
