@@ -1,4 +1,4 @@
-package com.github.yulechen.datastruct.tree;
+package com.github.yulechen.datastruct.base.tree;
 
 /**
  * Red black tree
