@@ -19,7 +19,6 @@ public class MonoCore {
             - return MonoJust
 
    - Mono#subscribe (consumer())
-
       -- LambdaMonoSubscriber(consumer,null,null)#onNext(),consumer.accept(x);
         - subscribe(LambdaMonoSubscriber)
           - subClass#MonoJust#subscribe

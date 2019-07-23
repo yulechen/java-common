@@ -20,7 +20,9 @@ public class CoreTest {
       @Override
       public void onSubscribe(Subscription s) {
         System.out.println(System.currentTimeMillis()+" :"+Thread.currentThread().getId() + " :" + s + " onSubscribe ");
-
+        // 1、call onNext ,if request ==0 will not call onNext
+        // 2、maybe will call onError,onComplete
+        s.request(100);
       }
 
       @Override
@@ -38,9 +40,9 @@ public class CoreTest {
         System.out.println(System.currentTimeMillis()+" :"+Thread.currentThread().getId() + " :"  + " onComplete ");
       }
     });
-     print("main-thread");
-    ints.subscribe(CoreTest::print);
-    ints.subscribe(CoreTest::print);
+  //  print("main-thread");
+  //  ints.subscribe(CoreTest::print);
+  //  ints.subscribe(CoreTest::print);
   }
 
 
