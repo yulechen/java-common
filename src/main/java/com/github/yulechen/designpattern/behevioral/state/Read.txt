@@ -1,0 +1,36 @@
+Intent:
+Allow an object to alter its behavior when its internal state changes.The object will appear to change its class.
+
+对象的状态变化，会改变他的行为。不同的内部状态决定了外部的行为。
+每个状态对应着自己的行为
+
+1、抽象对象的行为
+2、对象的行为依据不同状态，执行不一样。
+
+3、把对象行为的变化点，抽象到一个 对象状态类中去，让状态类来判断。一个对象类 按照 state -copy N 个行为
+   可以让状态和行为分开独立变化
+
+4、把所有对象行为 关联到 对象状态上去TCPConnection（open ,close） -- TCPState(open,close)
+
+5、主要是为了解决复杂的状态转换逻辑
+
+Motivation:
+ TCPConnect
+  -Established，Listening，Closed
+
+Applicability:
+An object's behavior depends on its state, and it must change itsbehavior at run-time depending on that state.
+
+如果一个方法含有大量的条件判断，并且依赖另外一个对象的状态。这个状态通常包含大量的枚举常量。
+通常 ，几个方法含有相同的条件判决，State Pattern，把每个条件分支，当做一个单独类来处理。
+这样把对象的状态 当做一个对象来处理，可以让他和其他对象独立变化。
+
+
+Participants:
+Context-TCPConnection
+State- TCPState
+ConcreteState subclasses -TCPEstablished
+
+
+Extend :
+  spring-statemachine-core
