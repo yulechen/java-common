@@ -40,7 +40,10 @@ public class Permute {
 
 
   /**
-   * nums.length=3
+   *
+   *  一直remove一个元素，用剩下的来全排列。
+   *
+   *
    */
 
   public static List<List<Integer>> permute(int[] nums) {

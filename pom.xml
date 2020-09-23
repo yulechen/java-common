@@ -84,7 +84,13 @@
       <artifactId>reactor-netty</artifactId>
     </dependency>
 
-
+    <dependency>
+      <groupId>redis.clients</groupId>
+      <artifactId>jedis</artifactId>
+      <version>3.2.0</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
     <!--java 内存布局 http://openjdk.java.net/projects/code-tools/jol/ -->
 <!--      <version>1.2.3.RELEASE</version>
 
